@@ -87,12 +87,11 @@ def split_list(_list=LATEST):
     csv = read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, blocksize=25e6,
                    parse_dates=True)
-    csv = csv[csv.COLLECTION_NUMBER != 'PRE']
 
     sats = unique(csv.SPACECRAFT_ID).tolist()
     for sat in sats:
         print(sat)
-        df = csv[csv.SPACECRAFT_ID == sat]
+        df = csv[csv.SPACECRAFT_ID == sat and csv.COLLECTION_NUMBER != 'PRE']
         dst = os.path.join(SCENES, sat)
         if os.path.isfile(dst):
             os.remove(dst)
