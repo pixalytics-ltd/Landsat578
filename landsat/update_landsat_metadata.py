@@ -108,7 +108,7 @@ def split_list(_list=LATEST):
                 os.remove(dst)
                 dfp.append(df)
                 dfp.to_parquet('{}'.format(dst))
-            count += 1
+        count += 1
 
     return None
 
