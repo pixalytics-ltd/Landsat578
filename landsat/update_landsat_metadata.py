@@ -85,30 +85,28 @@ def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
     chunksize = 1000 # the number of rows per chunk
-    count = 0
+    print('Extracting satellites to ', SCENES)
     for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
-        if count == 0:
-            print('Extracting satellites to ', SCENES)
         sats = unique(csv.SPACECRAFT_ID).tolist()
+        processed_sats = []
         for sat in sats:
-            if count == 0:
-                print(sat)
             csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = csv[csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat)
-            if count == 0:
+            if sat in processed_sats:
+                dfp = pd.read_parquet(dst)
+                os.remove(dst)
+                dfp.append(df)
+                dfp.to_parquet('{}'.format(dst))
+            else:
+                print(sat)
                 if os.path.isfile(dst):
                     os.remove(dst)
                 # if not os.path.isdir(dst):
                 #     os.mkdir(dst)
                 df.to_parquet('{}'.format(dst))
-            else:
-                dfp = pd.read_parquet(dst)
-                os.remove(dst)
-                dfp.append(df)
-                dfp.to_parquet('{}'.format(dst))
-        count += 1
+                processed_sats.append(sat)
 
     return None
 
