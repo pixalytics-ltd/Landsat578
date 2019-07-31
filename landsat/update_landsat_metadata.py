@@ -20,8 +20,6 @@ import gzip
 from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
-import fastparquet as fpq
-from dask.dataframe import read_csv
 import pandas as pd
 from requests import get
 
@@ -94,7 +92,8 @@ def split_list(_list=LATEST):
             print('Extracting satellites to ', SCENES)
         sats = unique(csv.SPACECRAFT_ID).tolist()
         for sat in sats:
-            print(sat)
+            if count == 0:
+                print(sat)
             csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = csv[csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat)
