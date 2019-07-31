@@ -84,20 +84,27 @@ def download_latest_metadata():
 def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
-    csv = read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
+    chunksize = 1000 # the number of rows per chunk
+    count = 0
+    for csv in read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, blocksize=25e6,
-                   parse_dates=True)
-
-    sats = unique(csv.SPACECRAFT_ID).tolist()
-    for sat in sats:
-        print(sat)
-        df = csv[csv.SPACECRAFT_ID == sat and csv.COLLECTION_NUMBER != 'PRE']
-        dst = os.path.join(SCENES, sat)
-        if os.path.isfile(dst):
-            os.remove(dst)
-        if not os.path.isdir(dst):
-            os.mkdir(dst)
-        df.to_parquet('{}'.format(dst))
+                   parse_dates=True, chunksize=chunksize, iterator=True):
+        if count == 0:
+            print('Extracting satellites to ', SCENES)
+        sats = unique(csv.SPACECRAFT_ID).tolist()
+        for sat in sats:
+            print(sat)
+            df = csv[csv.SPACECRAFT_ID == sat and csv.COLLECTION_NUMBER != 'PRE']
+            dst = os.path.join(SCENES, sat)
+            if count == 0:
+                if os.path.isfile(dst):
+                    os.remove(dst)
+                if not os.path.isdir(dst):
+                    os.mkdir(dst)
+                df.to_parquet('{}'.format(dst))
+            else:
+                df.to_parquet('{}'.format(dst), if_exists='append')
+            count += 1
 
     return None
 
