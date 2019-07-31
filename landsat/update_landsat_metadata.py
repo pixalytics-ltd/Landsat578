@@ -20,6 +20,7 @@ import gzip
 from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
+import fastparquet as fpq
 from dask.dataframe import read_csv
 import pandas as pd
 from requests import get
@@ -104,7 +105,10 @@ def split_list(_list=LATEST):
                 #     os.mkdir(dst)
                 df.to_parquet('{}'.format(dst))
             else:
-                df.to_parquet('{}'.format(dst), append=True)
+                dfp = pd.read_parquet(dst)
+                os.remove(dst)
+                dfp.append(df)
+                dfp.to_parquet('{}'.format(dst))
             count += 1
 
     return None
