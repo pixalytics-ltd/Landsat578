@@ -21,6 +21,7 @@ from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
 from dask.dataframe import read_csv
+import pandas as pd
 from requests import get
 
 LANDSAT_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-landsat/index.csv.gz'
@@ -86,7 +87,7 @@ def split_list(_list=LATEST):
     print('Please wait while scene metadata is split')
     chunksize = 1000 # the number of rows per chunk
     count = 0
-    for csv in read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
+    for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, blocksize=25e6,
                    parse_dates=True, chunksize=chunksize, iterator=True):
         if count == 0:
