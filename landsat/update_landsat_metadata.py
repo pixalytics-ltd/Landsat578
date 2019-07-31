@@ -86,10 +86,10 @@ def split_list(_list=LATEST):
     print('Please wait while scene metadata is split')
     chunksize = 1000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
+    processed_sats = []
     for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
         sats = unique(csv.SPACECRAFT_ID).tolist()
-        processed_sats = []
         for sat in sats:
             csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = csv[csv.SPACECRAFT_ID == sat]
