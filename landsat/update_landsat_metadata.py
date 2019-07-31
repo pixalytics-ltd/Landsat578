@@ -104,7 +104,7 @@ def split_list(_list=LATEST):
                 #     os.mkdir(dst)
                 df.to_parquet('{}'.format(dst))
             else:
-                df.to_parquet('{}'.format(dst), if_exists='append')
+                df.to_parquet('{}'.format(dst), append=True)
             count += 1
 
     return None
