@@ -94,7 +94,8 @@ def split_list(_list=LATEST):
         sats = unique(csv.SPACECRAFT_ID).tolist()
         for sat in sats:
             print(sat)
-            df = csv[csv.SPACECRAFT_ID == sat and csv.COLLECTION_NUMBER != 'PRE']
+            csv = csv[csv.COLLECTION_NUMBER != 'PRE']
+            df = csv[csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat)
             if count == 0:
                 if os.path.isfile(dst):
