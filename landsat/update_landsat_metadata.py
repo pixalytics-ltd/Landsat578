@@ -100,8 +100,8 @@ def split_list(_list=LATEST):
             if count == 0:
                 if os.path.isfile(dst):
                     os.remove(dst)
-                if not os.path.isdir(dst):
-                    os.mkdir(dst)
+                # if not os.path.isdir(dst):
+                #     os.mkdir(dst)
                 df.to_parquet('{}'.format(dst))
             else:
                 df.to_parquet('{}'.format(dst), if_exists='append')
