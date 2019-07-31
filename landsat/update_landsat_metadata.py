@@ -88,8 +88,7 @@ def split_list(_list=LATEST):
     chunksize = 1000 # the number of rows per chunk
     count = 0
     for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
-                                 'COLLECTION_CATEGORY': object}, blocksize=25e6,
-                   parse_dates=True, chunksize=chunksize, iterator=True):
+                                 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
         if count == 0:
             print('Extracting satellites to ', SCENES)
         sats = unique(csv.SPACECRAFT_ID).tolist()
