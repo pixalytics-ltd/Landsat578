@@ -16,6 +16,7 @@
 from __future__ import print_function, absolute_import
 
 import os
+import shutil
 import gzip
 from zipfile import ZipFile
 from numpy import unique
@@ -95,17 +96,18 @@ def split_list(_list=LATEST):
             df = csv[csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat)
             if sat in processed_sats:
-                dfp = pd.read_parquet(dst)
-                os.remove(dst)
+                dfp = pd.read_parquet(dst, engine='fastparquet')
+                shutil.rmtree(dst)
+                os.mkdir(dst)
                 dfp.append(df)
-                dfp.to_parquet('{}'.format(dst))
+                dfp.to_parquet('{}'.format(dst), engine='fastparquet')
             else:
                 print(sat)
                 if os.path.isfile(dst):
                     os.remove(dst)
                 if not os.path.isdir(dst):
                     os.mkdir(dst)
-                df.to_parquet('{}'.format(dst))
+                df.to_parquet('{}'.format(dst), engine='fastparquet')
                 processed_sats.append(sat)
 
     return None
