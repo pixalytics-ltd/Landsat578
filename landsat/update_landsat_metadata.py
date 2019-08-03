@@ -16,7 +16,6 @@
 from __future__ import print_function, absolute_import
 
 import os
-import shutil
 import gzip
 from zipfile import ZipFile
 from numpy import unique
@@ -97,7 +96,7 @@ def split_list(_list=LATEST):
             dst = os.path.join(SCENES, sat+'.gzip')
             if sat in processed_sats:
                 dfp = pd.read_parquet(dst, engine='fastparquet')
-                shutil.rmtree(dst)
+                os.remove(dst)
                 os.mkdir(dst)
                 dfp.append(df)
                 dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
