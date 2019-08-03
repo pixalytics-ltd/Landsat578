@@ -89,10 +89,10 @@ def split_list(_list=LATEST):
     processed_sats = []
     for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
-        sats = unique(csv.SPACECRAFT_ID).tolist()
+        filtered_csv = csv[csv.COLLECTION_NUMBER != 'PRE']
+        sats = unique(filtered_csv.SPACECRAFT_ID).tolist()
         print("Found: ", sats)
         for sat in sats:
-            filtered_csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = filtered_csv[filtered_csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat+'.gzip')
             if sat in processed_sats:
@@ -106,6 +106,7 @@ def split_list(_list=LATEST):
                     os.remove(dst)
                 df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                 processed_sats.append(sat)
+                print("Processed", sat)
 
     return None
 
