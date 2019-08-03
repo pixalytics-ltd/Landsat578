@@ -96,18 +96,18 @@ def split_list(_list=LATEST):
             df = csv[csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat)
             if sat in processed_sats:
-                dfp = pd.read_parquet(dst, engine='fastparquet')
+                dfp = pd.read_parquet(dst, engine='fastparquet', compression='gzip')
                 shutil.rmtree(dst)
                 os.mkdir(dst)
                 dfp.append(df)
-                dfp.to_parquet('{}'.format(dst), engine='fastparquet')
+                dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
             else:
                 print(sat)
                 if os.path.isfile(dst):
                     os.remove(dst)
                 #if not os.path.isdir(dst):
                 #    os.mkdir(dst)
-                df.to_parquet('{}'.format(dst), engine='fastparquet')
+                df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                 processed_sats.append(sat)
 
     return None
