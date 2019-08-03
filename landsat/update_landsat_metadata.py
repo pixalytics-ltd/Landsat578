@@ -93,23 +93,23 @@ def split_list(_list=LATEST):
     while loop:
         try:
             chunk = df.get_chunk(chunksize)
-            filtered_chunk = chunk[chunk.COLLECTION_NUMBER != 'PRE']
-            sats = unique(filtered_chunk.SPACECRAFT_ID).tolist()
+            fc = chunk[chunk.COLLECTION_NUMBER != 'PRE']
+            sats = unique(fc.SPACECRAFT_ID).tolist()
             print("Found: ", sats)
             for sat in sats:
-                df = filtered_chunk[filtered_chunk.SPACECRAFT_ID == sat]
+                sfc = fc[fc.SPACECRAFT_ID == sat]
                 dst = os.path.join(SCENES, sat+'.gzip')
                 if sat in processed_sats:
                     dfp = pd.read_parquet(dst, engine='fastparquet')
                     os.remove(dst)
-                    dfp.append(df)
+                    dfp.append(sfc)
                     dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                     print("Appended {} {}".format(sat,count))
                 else:
                     print(sat)
                     if os.path.exists(dst):
                         os.remove(dst)
-                    df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
+                    sfc.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                     processed_sats.append(sat)
                     print("Processed {} {}".format(sat,count))
         except StopIteration:
