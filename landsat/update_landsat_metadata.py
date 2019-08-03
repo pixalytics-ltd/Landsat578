@@ -87,27 +87,34 @@ def split_list(_list=LATEST):
     chunksize = 5000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
-    for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
-                                 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
-        filtered_csv = csv[csv.COLLECTION_NUMBER != 'PRE']
-        sats = unique(filtered_csv.SPACECRAFT_ID).tolist()
-        print("Found: ", sats)
-        for sat in sats:
-            df = filtered_csv[filtered_csv.SPACECRAFT_ID == sat]
-            dst = os.path.join(SCENES, sat+'.gzip')
-            if sat in processed_sats:
-                dfp = pd.read_parquet(dst, engine='fastparquet')
-                os.remove(dst)
-                dfp.append(df)
-                dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
-                print("Appended", sat)
-            else:
-                print(sat)
-                if os.path.exists(dst):
+    df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
+    loop = True
+    count = 0
+    while loop:
+        try:
+            chunk = df.get_chunk(chunksize)
+            filtered_chunk = chunk[chunk.COLLECTION_NUMBER != 'PRE']
+            sats = unique(filtered_chunk.SPACECRAFT_ID).tolist()
+            print("Found: ", sats)
+            for sat in sats:
+                df = filtered_chunk[filtered_chunk.SPACECRAFT_ID == sat]
+                dst = os.path.join(SCENES, sat+'.gzip')
+                if sat in processed_sats:
+                    dfp = pd.read_parquet(dst, engine='fastparquet')
                     os.remove(dst)
-                df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
-                processed_sats.append(sat)
-                print("Processed", sat)
+                    dfp.append(df)
+                    dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
+                    print("Appended {} {}".format(sat,count))
+                else:
+                    print(sat)
+                    if os.path.exists(dst):
+                        os.remove(dst)
+                    df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
+                    processed_sats.append(sat)
+                    print("Processed {} {}".format(sat,count))
+        except StopIteration:
+            loop = False
+        count += 1
 
     return None
 
