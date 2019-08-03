@@ -84,22 +84,19 @@ def download_latest_metadata():
 def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
-    chunksize = 5000 # the number of rows per chunk
+    chunksize = 50000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
     df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
     loop = True
-    count = 0
     while loop:
         try:
             chunk = df.get_chunk(chunksize)
             fc = chunk[chunk.COLLECTION_NUMBER != 'PRE']
-            #if fc['SPACECRAFT_ID'].str.contains('LANDSAT'):
             if fc.empty is True:
                 sats = []
             else:
                 sats = unique(fc.SPACECRAFT_ID).tolist()
-            print("Found: ", sats)
             for sat in sats:
                 sfc = fc[fc.SPACECRAFT_ID == sat]
                 dst = os.path.join(SCENES, sat+'.gzip')
@@ -108,17 +105,14 @@ def split_list(_list=LATEST):
                     os.remove(dst)
                     dfp.append(sfc)
                     dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
-                    print("Appended {} {}".format(sat,count))
                 else:
                     print(sat)
                     if os.path.exists(dst):
                         os.remove(dst)
                     sfc.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                     processed_sats.append(sat)
-                    print("Processed {} {}".format(sat,count))
         except StopIteration:
             loop = False
-        count += 1
 
     return None
 
