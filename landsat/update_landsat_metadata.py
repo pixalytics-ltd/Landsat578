@@ -84,12 +84,13 @@ def download_latest_metadata():
 def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
-    chunksize = 1000 # the number of rows per chunk
+    chunksize = 5000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
     for csv in pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
                                  'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
         sats = unique(csv.SPACECRAFT_ID).tolist()
+        print("Found: ", sats)
         for sat in sats:
             filtered_csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = filtered_csv[filtered_csv.SPACECRAFT_ID == sat]
@@ -101,7 +102,7 @@ def split_list(_list=LATEST):
                 dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
             else:
                 print(sat)
-                if os.path.isfile(dst):
+                if os.path.exists(dst):
                     os.remove(dst)
                 df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                 processed_sats.append(sat)
