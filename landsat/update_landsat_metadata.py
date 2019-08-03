@@ -97,7 +97,6 @@ def split_list(_list=LATEST):
             if sat in processed_sats:
                 dfp = pd.read_parquet(dst, engine='fastparquet')
                 os.remove(dst)
-                os.mkdir(dst)
                 dfp.append(df)
                 dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
             else:
