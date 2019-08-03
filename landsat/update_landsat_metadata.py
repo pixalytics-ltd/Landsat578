@@ -100,6 +100,7 @@ def split_list(_list=LATEST):
                 os.remove(dst)
                 dfp.append(df)
                 dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
+                print("Appended", sat)
             else:
                 print(sat)
                 if os.path.exists(dst):
