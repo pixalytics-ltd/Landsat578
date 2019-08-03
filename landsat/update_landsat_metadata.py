@@ -91,8 +91,8 @@ def split_list(_list=LATEST):
                                  'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True):
         sats = unique(csv.SPACECRAFT_ID).tolist()
         for sat in sats:
-            csv = csv[csv.COLLECTION_NUMBER != 'PRE']
-            df = csv[csv.SPACECRAFT_ID == sat]
+            filtered_csv = csv[csv.COLLECTION_NUMBER != 'PRE']
+            df = filtered_csv[filtered_csv.SPACECRAFT_ID == sat]
             dst = os.path.join(SCENES, sat+'.gzip')
             if sat in processed_sats:
                 dfp = pd.read_parquet(dst, engine='fastparquet')
