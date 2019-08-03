@@ -103,8 +103,6 @@ def split_list(_list=LATEST):
                 print(sat)
                 if os.path.isfile(dst):
                     os.remove(dst)
-                #if not os.path.isdir(dst):
-                #    os.mkdir(dst)
                 df.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                 processed_sats.append(sat)
 

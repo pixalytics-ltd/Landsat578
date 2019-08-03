@@ -198,10 +198,10 @@ class GoogleDownload(object):
         if not os.path.isdir(self.scenes):
             update_metadata_lists()
 
-        path = os.path.join(self.scenes, 'LANDSAT_{}'.format(self.sat_num))
-        if not os.path.isdir(path):
+        path = os.path.join(self.scenes, 'LANDSAT_{}'.format(self.sat_num)+'.gzip')
+        if not os.path.exists(path):
             update_metadata_lists()
-        self.scenes_abspath = path+'gzip'
+        self.scenes_abspath = path
 
         if not os.path.isdir(WRS_DIR):
             get_wrs_shapefiles()
