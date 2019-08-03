@@ -94,9 +94,10 @@ def split_list(_list=LATEST):
         try:
             chunk = df.get_chunk(chunksize)
             fc = chunk[chunk.COLLECTION_NUMBER != 'PRE']
-            sats = unique(fc.SPACECRAFT_ID)
-            if len(sats) > 0:
-                sats.tolist()
+            if 'SPACECRAFT_ID' in fc:
+                sats = unique(fc.SPACECRAFT_ID).tolist()
+            else:
+                sats = []
             print("Found: ", sats)
             for sat in sats:
                 sfc = fc[fc.SPACECRAFT_ID == sat]
