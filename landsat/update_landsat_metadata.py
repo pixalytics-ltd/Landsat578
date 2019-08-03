@@ -94,9 +94,9 @@ def split_list(_list=LATEST):
         for sat in sats:
             csv = csv[csv.COLLECTION_NUMBER != 'PRE']
             df = csv[csv.SPACECRAFT_ID == sat]
-            dst = os.path.join(SCENES, sat)
+            dst = os.path.join(SCENES, sat+'.gzip')
             if sat in processed_sats:
-                dfp = pd.read_parquet(dst, engine='fastparquet', compression='gzip')
+                dfp = pd.read_parquet(dst, engine='fastparquet')
                 shutil.rmtree(dst)
                 os.mkdir(dst)
                 dfp.append(df)
