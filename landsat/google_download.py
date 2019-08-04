@@ -145,7 +145,7 @@ class GoogleDownload(object):
     def candidate_scenes(self, return_list=False, list_type='low_cloud'):
 
         path = self.scenes_abspath
-        df = read_parquet(path, engine='fastparquet')
+        df = read_parquet(path, engine='pyarrow')
         s, e = Timestamp(self.start_dt), Timestamp(self.end_dt)
         pr = df.loc[(df.WRS_PATH == self.p) & (df.WRS_ROW == self.r)]
         df = None
@@ -198,7 +198,7 @@ class GoogleDownload(object):
         if not os.path.isdir(self.scenes):
             update_metadata_lists()
 
-        path = os.path.join(self.scenes, 'LANDSAT_{}'.format(self.sat_num)+'.gzip')
+        path = os.path.join(self.scenes, 'LANDSAT_{}'.format(self.sat_num))
         if not os.path.exists(path):
             update_metadata_lists()
         self.scenes_abspath = path
