@@ -94,6 +94,7 @@ def main(args):
 
         if cfg['update_scenes']:
             update_metadata_lists()
+            sys.exit(1)
 
         if cfg['return_list']:
             return_scene_list = True

@@ -20,7 +20,8 @@ import gzip
 from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
-from dask.dataframe import read_csv
+import pandas as pd
+from fastparquet import write
 from requests import get
 
 LANDSAT_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-landsat/index.csv.gz'
@@ -84,21 +85,32 @@ def download_latest_metadata():
 def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
-    csv = read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object,
-                                 'COLLECTION_CATEGORY': object}, blocksize=25e6,
-                   parse_dates=True)
-    csv = csv[csv.COLLECTION_NUMBER != 'PRE']
-
-    sats = unique(csv.SPACECRAFT_ID).tolist()
-    for sat in sats:
-        print(sat)
-        df = csv[csv.SPACECRAFT_ID == sat]
-        dst = os.path.join(SCENES, sat)
-        if os.path.isfile(dst):
-            os.remove(dst)
-        if not os.path.isdir(dst):
-            os.mkdir(dst)
-        df.to_parquet('{}'.format(dst))
+    chunksize = 250000 # the number of rows per chunk
+    print('Extracting satellites to ', SCENES)
+    processed_sats = []
+    df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
+    loop = True
+    while loop:
+        try:
+            chunk = df.get_chunk(chunksize)
+            fc = chunk[chunk.COLLECTION_NUMBER != 'PRE']
+            if fc.empty is True:
+                sats = []
+            else:
+                sats = unique(fc.SPACECRAFT_ID).tolist()
+            for sat in sats:
+                sfc = fc[fc.SPACECRAFT_ID == sat]
+                dst = os.path.join(SCENES, sat)
+                if sat in processed_sats:
+                    write(dst, sfc, append=True, compression='GZIP')
+                else:
+                    print(sat)
+                    if os.path.exists(dst):
+                        os.remove(dst)
+                    write(dst, sfc, compression='GZIP')
+                    processed_sats.append(sat)
+        except StopIteration:
+            loop = False
 
     return None
 
