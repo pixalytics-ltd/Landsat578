@@ -104,14 +104,14 @@ def split_list(_list=LATEST):
                 dst = os.path.join(SCENES, sat)
                 table = pa.Table.from_pandas(sfc)
                 if sat in processed_sats:
-                    writer = pq.ParquetWriter(sfc, table.schema, compression='gzip')
+                    writer = pq.ParquetWriter(dst, table.schema, compression='gzip')
                     writer.write_table(table=table, append=True)
                     writer.close()
                 else:
                     print(sat)
                     if os.path.exists(dst):
                         os.remove(dst)
-                    writer = pq.ParquetWriter(sfc, table.schema, compression='gzip')
+                    writer = pq.ParquetWriter(dst, table.schema, compression='gzip')
                     writer.write_table(table=table)
                     writer.close()
                     processed_sats.append(sat)
