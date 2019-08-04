@@ -21,8 +21,7 @@ from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
+from fastparquet import write
 from requests import get
 
 LANDSAT_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-landsat/index.csv.gz'
@@ -102,18 +101,13 @@ def split_list(_list=LATEST):
             for sat in sats:
                 sfc = fc[fc.SPACECRAFT_ID == sat]
                 dst = os.path.join(SCENES, sat)
-                table = pa.Table.from_pandas(sfc)
                 if sat in processed_sats:
-                    writer = pq.ParquetWriter(dst, table.schema, compression='gzip')
-                    writer.write_table(table=table, append=True)
-                    writer.close()
+                    write(dst, sfc, append=True, compression='GZIP')
                 else:
                     print(sat)
                     if os.path.exists(dst):
                         os.remove(dst)
-                    writer = pq.ParquetWriter(dst, table.schema, compression='gzip')
-                    writer.write_table(table=table)
-                    writer.close()
+                    write(dst, sfc, compression='GZIP')
                     processed_sats.append(sat)
         except StopIteration:
             loop = False
