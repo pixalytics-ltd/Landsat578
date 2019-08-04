@@ -84,7 +84,7 @@ def download_latest_metadata():
 def split_list(_list=LATEST):
 
     print('Please wait while scene metadata is split')
-    chunksize = 50000 # the number of rows per chunk
+    chunksize = 250000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
     df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
@@ -102,8 +102,8 @@ def split_list(_list=LATEST):
                 dst = os.path.join(SCENES, sat+'.gzip')
                 if sat in processed_sats:
                     dfp = pd.read_parquet(dst, engine='fastparquet')
-                    os.remove(dst)
                     dfp.append(sfc)
+                    os.remove(dst)
                     dfp.to_parquet('{}'.format(dst), engine='fastparquet', compression='gzip')
                 else:
                     print(sat)
