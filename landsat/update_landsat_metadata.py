@@ -22,6 +22,7 @@ from numpy import unique
 from datetime import datetime
 import pandas as pd
 from fastparquet import write
+from pandas.io.common import EmptyDataError
 from requests import get
 
 LANDSAT_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-landsat/index.csv.gz'
@@ -38,7 +39,6 @@ WRS_DIR = os.path.join(os.path.dirname(__file__), 'wrs')
 fmt = '%Y%m%d'
 date = datetime.strftime(datetime.now(), fmt)
 LATEST = 'scenes_{}'.format(date)
-
 PARSE_DATES = ['DATE_ACQUIRED', 'SENSING_TIME']
 
 
@@ -88,7 +88,13 @@ def split_list(_list=LATEST):
     chunksize = 250000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
-    df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
+    try:
+        df = pd.read_csv(_list,
+                         dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object},
+                         parse_dates=True, chunksize=chunksize, iterator=True)
+    except EmptyDataError:
+        print('Metadata has already been updated for the day.')
+        return None
     loop = True
     while loop:
         try:
