@@ -21,8 +21,8 @@ from zipfile import ZipFile
 from numpy import unique
 from datetime import datetime
 import pandas as pd
-from fastparquet import write
 from pandas.io.common import EmptyDataError
+from fastparquet import write
 from requests import get
 
 LANDSAT_METADATA_URL = 'http://storage.googleapis.com/gcp-public-data-landsat/index.csv.gz'
