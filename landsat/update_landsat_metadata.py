@@ -39,7 +39,6 @@ WRS_DIR = os.path.join(os.path.dirname(__file__), 'wrs')
 fmt = '%Y%m%d'
 date = datetime.strftime(datetime.now(), fmt)
 LATEST = 'scenes_{}'.format(date)
-
 PARSE_DATES = ['DATE_ACQUIRED', 'SENSING_TIME']
 
 
@@ -90,11 +89,12 @@ def split_list(_list=LATEST):
     print('Extracting satellites to ', SCENES)
     processed_sats = []
     try:
-        df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
+        df = pd.read_csv(_list,
+                         dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object},
+                         parse_dates=True, chunksize=chunksize, iterator=True)
     except EmptyDataError:
         print('Metadata has already been updated for the day.')
         return None
-
     loop = True
     while loop:
         try:
