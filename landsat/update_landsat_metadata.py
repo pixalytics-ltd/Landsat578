@@ -88,7 +88,7 @@ def split_list(_list=LATEST):
     chunksize = 250000 # the number of rows per chunk
     print('Extracting satellites to ', SCENES)
     processed_sats = []
-    df = pd.read_csv(_list, dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
+    df = pd.read_csv(os.path.join(SCENES,'index.csv.gz'), dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object}, parse_dates=True, chunksize=chunksize, iterator=True)
     loop = True
     while loop:
         try:
