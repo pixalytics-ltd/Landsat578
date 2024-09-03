@@ -131,7 +131,7 @@ class SatMetaData(object):
                             os.remove(dst)
                         write(dst, sfc, compression='GZIP')
                         processed_sats.append(sat)
-              except StopIteration:
+            except StopIteration:
                 loop = False
 
         return None
