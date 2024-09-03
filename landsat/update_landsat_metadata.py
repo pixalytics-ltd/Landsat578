@@ -106,7 +106,7 @@ class SatMetaData(object):
 
         print('Please wait while {} scene metadata is split'.format(self.sat))
         chunksize = 250000 # the number of rows per chunk
-        print('Extracting satellites to ', SCENES)
+        print('Extracting satellites to ', self.scenes)
         processed_sats = []
         df = pd.read_csv(_list,
                          dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object},
@@ -122,7 +122,7 @@ class SatMetaData(object):
                     sats = unique(fc.SPACECRAFT_ID).tolist()
                 for sat in sats:
                     sfc = fc[fc.SPACECRAFT_ID == sat]
-                    dst = os.path.join(SCENES, sat)
+                    dst = os.path.join(self.scenes, sat)
                     if sat in processed_sats:
                         write(dst, sfc, append=True, compression='GZIP')
                     else:
