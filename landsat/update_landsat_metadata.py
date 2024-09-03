@@ -19,7 +19,7 @@ import gzip
 import os
 from datetime import datetime
 import pandas as pd
-from pandas.io.common import EmptyDataError
+from pandas.errors import EmptyDataError
 from fastparquet import write
 from zipfile import ZipFile, BadZipFile
 from fastkml import kml
