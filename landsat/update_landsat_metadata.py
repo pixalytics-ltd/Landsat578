@@ -108,7 +108,7 @@ class SatMetaData(object):
         chunksize = 250000 # the number of rows per chunk
         print('Extracting satellites to ', self.scenes)
         processed_sats = []
-        df = pd.read_csv(self.latest,
+        df = pd.read_csv(self.scenes_zip,
                          dtype={'PRODUCT_ID': object, 'COLLECTION_NUMBER': object, 'COLLECTION_CATEGORY': object},
                          parse_dates=True, chunksize=chunksize, iterator=True)
         loop = True
